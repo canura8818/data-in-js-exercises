@@ -59,9 +59,15 @@ const callsListElement = document.getElementById('calls-list');
 /**
  * Fetch and parse the CSV data from the API using D3
  * @returns {Array} Array of call objects
+ * callback not preferred because it can get messy with more nested calls
+ * promise provides standardized interface for callbacks
+ * if a function returns a promise, 'await' has to be used to get the value
  */
+
 async function fetchCallsData() {
-  // ... Your code here ...
+  const data = await d3.csv(API_URL);
+  console.log(data)
+  return data
 }
 
 /**
@@ -104,6 +110,21 @@ function getStatusClass(status) {
  */
 function createCallListItem(call) {
   // ... Your code here ...
+  const serviceName = call.service_name;
+  const address = call.address
+  const requestDate = new Date(call.requested_datetime);
+  const status = call.status;
+  const statusClass = getStatusClass(status);
+  const html = `
+    <li class="call-item">
+      <span class="name">${serviceName}</span>
+      <span class="call-address">${address}</span>
+      <span class="date">${requestDate}</span>
+      <span class="call-status">${statusClass}</span>
+    </li>
+  `;
+  const listItem = htmlToElement(html);
+  return listItem
 }
 
 /**
@@ -112,7 +133,7 @@ function createCallListItem(call) {
  */
 function displayCalls(calls) {
   // Clear the existing list
-  callsListElement.innerHTML = '';
+  callsListElement.innerHTML = ``;
 
   // Update the count
   callCountElement.textContent = calls.length;

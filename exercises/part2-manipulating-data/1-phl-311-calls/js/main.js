@@ -75,7 +75,11 @@ async function fetchCallsData(callsToFetch = 200, callsToSkip = 0) {
   // fetch the first 200 calls, then the next 200, and so on.
 
   // ... Your code here ...
+  const data = await d3.csv(API_URL);
+  console.log(data)
+  return data
 }
+
 
 /**
  * Filter calls based on current filter state
@@ -86,7 +90,13 @@ function filterCalls(calls) {
   const typeFilter = getCurrentTypeFilter();
   const statusFilter = getCurrentStatusFilter();
 
-  // ... Your code here ...
+  const filteredCall = calls.filter(call => {
+    const type_match = call.service_type === typeFilter
+    const status_match = call.status === statusFilter
+    return type_match || status_match
+  })
+
+  return filteredCall
 }
 
 /**

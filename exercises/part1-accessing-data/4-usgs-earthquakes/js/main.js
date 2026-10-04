@@ -41,6 +41,10 @@ function initEarthquakeMap(elementOrId) {
  */
 async function getEarthquakeData() {
   // ... Your code here ...
+  const API_URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson'
+  const response = await fetch(API_URL)
+  const data = await response.json()
+  return data
 }
 
 /**
@@ -51,8 +55,9 @@ async function getEarthquakeData() {
 function getRadiusFromMagnitude(magnitude) {
   // Scale magnitude to reasonable pixel radius
   // Magnitude typically ranges from 0-10; re-scale to 2-50 pixels
-
-  return; // ... Your code here ...;
+  const scaleFactor = 5
+  const radius = Math.round(magnitude * scaleFactor)
+  return radius; // ... Your code here ...
 }
 
 /**
@@ -81,9 +86,17 @@ async function initEarthquakeLayer(map) {
   const layer = L.geoJSON(earthquakeData, {
     pointToLayer: (feature, latlng) => {
       // ... Your code here ...
+      const radius = getRadiusFromMagnitude(feature.properties.mag)
+      const depth = feature.geometry.coordinates[2];
+      return L.circleMarker(latlng, { 
+        radius:radius,
+        fillOpacity:0.8,
+        opacity:0.8,
+        color:getColorFromDepth(depth)
+      })
     },
     onEachFeature: (feature, layer) => {
-      // layer.bindPopup(`... Your code here ...`);
+      layer.bindPopup(`<b>Name: ${feature.properties.title}</b>`);
     },
   }).addTo(map);
 

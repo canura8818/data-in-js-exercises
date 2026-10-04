@@ -75,6 +75,13 @@ function initChart(elementId) {
  */
 async function getAirQualityData(corsproxykey, apiKey) {
   // ... Your code here ...
+  const targetUrl = 'https://api.openaq.org/v3/sensors/1506/measurements?limit=1000'
+  const proxyUrl = `https://corsproxy.io/?key=${corsproxykey}&url=${encodeURIComponent(targetUrl)}`
+
+  const response = await fetch(proxyUrl, { headers: { 'X-API-Key': apiKey } })
+  const data = await response.json()
+  console.log(data.results)
+  return data.results
 }
 
 /**
@@ -87,6 +94,15 @@ async function plotAirQualityData(chart) {
   const aqData = await getAirQualityData(corsproxykey, apiKey);
 
   // ... Your code here ...
+  const timestamps = ['x', ...aqData.map(item => item.coverage.datetimeFrom.utc)]
+  const pmValues = ['pm25', ...aqData.map(item => item.value)]
+
+  chart.load({
+    columns: [
+      timestamps,
+      pmValues
+    ]
+  });
 }
 
 /**

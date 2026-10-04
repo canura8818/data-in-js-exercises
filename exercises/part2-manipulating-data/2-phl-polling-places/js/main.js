@@ -33,13 +33,34 @@ function initPollingPlaceMap(elementOrId) {
   return map;
 }
 
+const url = "https://phl.carto.com/api/v2/sql?q=SELECT+*+FROM+polling_places&filename=polling_places&format=geojson&skipfields=cartodb_id";
+let response = await fetch(url)
+let pollPlaceData = await response.json();
+
+console.log(pollPlaceData);
+
 /**
  * Fetches the polling place data from OpenDataPhilly AND
  * AGGREGATES IT BASED ON UNIQUE STREET ADDRESSES.
  * @returns {Promise<GeoJSON.FeatureCollection>} The deduplicated polling place data.
  */
 async function getPollingPlaceData() {
-  // ... Your code here ...
+  const url = "https://phl.carto.com/api/v2/sql?q=SELECT+*+FROM+polling_places&filename=polling_places&format=geojson&skipfields=cartodb_id";
+  let response = await fetch(url)
+  let pollPlaceData = await response.json();
+
+  const uniqueAddresses = pollPlaceData.features.reduce((acc, feature) => {
+    const address = feature.properties.street_address
+    if (!acc[address]) {
+      acc[address] = feature
+    }
+
+    return acc
+  }, {})
+
+  pollPlaceData.features = Object.values(uniqueAddresses)
+  console.log(pollPlaceData);
+  return pollPlaceData
 }
 
 /**
@@ -68,7 +89,23 @@ async function initPollingPlaceLayer(map) {
       return L.marker(latlng, { icon: icon });
     },
     onEachFeature: function (feature, layer) {
-      layer.bindPopup(`...`);
+      const name = feature.properties.placename;
+      const address = feature.properties.street_address;
+      const precinct = feature.properties.precinct;
+
+      layer.bindPopup(`
+        <dl>
+          <dt>Name: ${name}</dt>
+        </dl>
+        
+        <dl>
+          <dt>Address: ${address}</dt>
+        </dl>
+        
+        <dl>
+          <dt>Precinct: ${precinct}</dt>
+        </dl>
+        `);
     },
   }).addTo(map);
 

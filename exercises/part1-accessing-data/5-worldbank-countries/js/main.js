@@ -93,6 +93,25 @@ async function getCountriesData(regionCode = '', page = 1) {
   // }
 
   // ... Your code here ...
+  let API_URL = `http://api.worldbank.org/v2/country?page=${page}&format=json`
+
+  const REGION_CODE = ['EAS', 'ECS', 'LCN', 'MEA', 'NAC', 'SAS', 'SSF']
+  if (REGION_CODE.includes(regionCode)) {
+    API_URL = `https://api.worldbank.org/v2/region/${regionCode}/country?page=${page}&format=json`;
+  }
+  
+  const response = await fetch(API_URL)
+
+  const [metadata, data] = await response.json();
+  const newObj = {
+    countries: data,
+    page: metadata.page,
+    perPage: metadata.per_page,
+    total: metadata.total,
+    totalPages: metadata.pages
+  };
+  console.log(newObj)
+  return newObj
 }
 
 /**
@@ -102,6 +121,13 @@ async function getCountriesData(regionCode = '', page = 1) {
  */
 function createCountryListItem(country) {
   // ... Your code here ...
+  const li = document.createElement('li')
+
+  const name = country.name
+  const region = country.region.value
+
+  li.innerHTML = `<b>${name}</b> (Region: ${region})`
+  return li
 }
 
 /**

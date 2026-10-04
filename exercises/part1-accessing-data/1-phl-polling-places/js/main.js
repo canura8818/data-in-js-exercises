@@ -36,6 +36,11 @@ function initPollingPlaceMap(elementOrId) {
  */
 async function getPollingPlaceData() {
   // ... Your code here ...
+  const API_URL = "https://phl.carto.com/api/v2/sql?q=SELECT+*+FROM+polling_places&filename=polling_places&format=geojson&skipfields=cartodb_id"
+  const response = await fetch(API_URL)
+  const data = await response.json()
+  console.log(data)
+  return data
 }
 
 /**
@@ -64,7 +69,12 @@ async function initPollingPlaceLayer(map) {
       return L.marker(latlng, { icon: icon });
     },
     onEachFeature: (feature, layer) => {
-      layer.bindPopup(`...`);
+      const name = feature.properties.placename
+      const address = feature.properties.street_address
+      layer.bindPopup(`
+        <li>Name: ${name}</li>
+        <li>Address: ${address}</li>
+        `);
     },
   }).addTo(map);
 

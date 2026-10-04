@@ -5,7 +5,7 @@ INSTRUCTIONS
 
 1.  Update the getHistoricMarkerData function to get the markers that match the
     given filters from the Pennsylvania Historical and Museum Commission. The
-    data comes in JSON format, and even through it is from an API, we still use
+    data comes in JSON format, and even though it is from an API, we still use
     the `fetch` function to retrieve it.
 
 2.  Update the updateHistoricMarkerLayer function to add each marker to the
@@ -56,6 +56,10 @@ async function getHistoricMarkerData(corsproxykey, keyword, categories) {
   //    categories, e.g.: &markerCategories=2&markerCategories=3
 
   // ... Your code here ...
+  const API_URL = `https://corsproxy.io/?key=${corsproxykey}&url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=${keyword}&countyCode=${philadelphiaCountyCode}&municipalities=${philadelphiaMunicipalityCode}&markerCategories=${categories}&markerMissing=`
+  const response = await fetch(API_URL)
+  const data = await response.json()
+  return data
 }
 
 /**
@@ -68,6 +72,15 @@ async function updateHistoricMarkerLayer(layer, keyword, categories) {
   const historicMarkers = await getHistoricMarkerData(getCorsProxyKey(), keyword, categories);
 
   // ... Your code here ...
+  layer.clearLayers()
+  for (const i of historicMarkers) {
+    const marker = L.marker([i.latitude, i.longitude])
+    marker.bindPopup(`
+      <li>Name: ${i.markerTitle}</li>
+      <li>Description: ${i.markerText}</li>
+      `)
+    layer.addLayer(marker)
+  }
 }
 
 /** Handles the form submission event to update the historic marker layer.

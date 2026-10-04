@@ -14,6 +14,15 @@ let currentCallTypeFilter = null;
  */
 function aggregateCallsByType(calls) {
   // ... Your code here ...
+  const aggregatedCalls = Object.groupBy(calls, ({ service_type }) => service_type)
+  const typeCounts = {};
+
+  for (const key in aggregatedCalls) {
+    typeCounts[key] = aggregatedCalls[key].length;
+  }
+
+  console.log(typeCounts)
+  return typeCounts
 }
 
 /**

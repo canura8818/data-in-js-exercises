@@ -14,6 +14,13 @@ let currentStatusFilter = null;
  */
 function aggregateCallsByStatus(calls) {
   // ... Your code here ...
+  const aggregatedStatus = calls.reduce((acc, call) => {
+    const status = call.status
+    acc[status] = (acc[status] || 0) + 1;
+    return acc
+  }, {})
+  console.log(aggregatedStatus)
+  return aggregatedStatus
 }
 
 /**
